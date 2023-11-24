@@ -1,0 +1,69 @@
+---- [ MAKING GKS LOG FOLDER ] ----
+Log_Folder = "GKSlog"
+Proxy_File = Log_Folder.."/proxyLog"
+function createLogFolder()
+	os.execute("mkdir " .. Log_Folder)
+end
+---- [ END MAKING GKS LOG FOLDER ] ----
+
+
+---- [ ADD PROXY ] ----
+function proxyLog()
+	local filename = string.format("%s.txt", Proxy_File)
+	local newFile = io.open(filename, "w")
+	for _, writeProxy in ipairs(Proxy_List) do
+		newFile:write(writeProxy.."\n")
+		sleep(200)
+	end
+	newFile:close()
+end
+
+function addProxyMain()
+	if Add_Proxy:upper() == "NO" then 
+		return 
+	elseif Add_Proxy:upper() == "YES" then
+		proxyLog()
+		for _, getProxy in pairs(Proxy_List) do
+			getProxyManager():addProxy(getProxy)
+			sleep(200)
+		end
+	end
+end
+---- [ END ADD PROXY ] ----
+
+
+---- [ RUNNING ] ----
+getProxyManager().localize = true
+sleep(500)
+getProxyManager().spread = false
+sleep(500)
+createLogFolder()
+sleep(500)
+getProxyManager():setLimit(Proxy_Limit)
+sleep(500)
+addProxyMain()
+sleep(500)
+
+for i = 1, Number_Of_Config_Used do
+	addBot(""..i.."",""..i.."")
+	sleep(200)
+end
+
+sleep(500)
+
+local indexUnRunningScript = {}
+function howManyBotsUnRunning()
+    for i, bot in ipairs(getBots()) do
+        if not bot:isRunningScript() then
+            table.insert(indexUnRunningScript, i)
+        end
+    end
+end
+
+howManyBotsUnRunning()
+
+for _, index in ipairs(indexUnRunningScript) do
+	getBots()[index]:runScript(All_Settings)
+	sleep(200)
+end
+---- [ END RUNNING ] ----
